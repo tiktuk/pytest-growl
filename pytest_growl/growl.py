@@ -2,7 +2,7 @@ import time
 import socket
 import struct
 from hashlib import md5
-from io import StringIO
+from io import BytesIO
 
 try:
     import gntp.notifier
@@ -69,7 +69,7 @@ def pytest_terminal_summary(terminalreporter):
 class SignedStructStream(object):
     def __init__(self):
         super(SignedStructStream, self).__init__()
-        self._stream = StringIO()
+        self._stream = BytesIO()
         self._hash = md5()
 
     def writeBuffer(self, buff, sign=True):
