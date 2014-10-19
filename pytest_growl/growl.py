@@ -1,12 +1,18 @@
 import time
 import socket
 import struct
-from cStringIO import StringIO
 from hashlib import md5
+
+try:
+    from io import StringIO
+except ImportError:
+    from cStringIO import StringIO
+
 try:
     import gntp.notifier
 except ImportError:
     pass
+
 _GROWL_UDP_PORT = 9887
 _GROWL_VERSION = 1
 _PACKET_TYPE_REGISTRATION = 0
