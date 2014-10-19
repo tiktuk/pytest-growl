@@ -2,11 +2,7 @@ import time
 import socket
 import struct
 from hashlib import md5
-
-try:
-    from io import StringIO
-except ImportError:
-    from cStringIO import StringIO
+from io import StringIO
 
 try:
     import gntp.notifier
