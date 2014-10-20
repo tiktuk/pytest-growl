@@ -40,6 +40,10 @@ def pytest_terminal_summary(terminalreporter):
         tr = terminalreporter
         quiet_mode = tr.config.getini(QUIET_MODE_INI)
         try:
+            errors = len(tr.stats['error'])
+        except KeyError:
+            errors = 0
+        try:
             passes = len(tr.stats['passed'])
         except KeyError:
             passes = 0
@@ -51,16 +55,16 @@ def pytest_terminal_summary(terminalreporter):
             skips = len(tr.stats['deselected'])
         except KeyError:
             skips = 0
-        if (passes + fails + skips) == 0:
+        if (errors + passes + fails + skips) == 0:
             send_growl(title="Alert", message="No Tests Ran")
             if not quiet_mode:
                 send_growl(title="Session Ended At", message="%s" % time.strftime("%I:%M:%S %p"))
             return
         else:
             if not skips:
-                message_to_send = "%s Passed %s Failed" % (passes, fails)
+                message_to_send = "%s Errors %s Passed %s Failed" % (errors, passes, fails)
             else:
-                message_to_send = "%s Passed %s Failed %s Skipped" % (passes, fails, skips)
+                message_to_send = "%s Errors %s Passed %s Failed %s Skipped" % (errors, passes, fails, skips)
         send_growl(title="Tests Complete", message=message_to_send)
         if not quiet_mode:
             send_growl(title="Session Ended At", message="%s" % time.strftime("%I:%M:%S %p"))
