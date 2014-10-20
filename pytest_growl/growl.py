@@ -123,7 +123,7 @@ def send_growl(message='', title='', _socket=socket.socket, _bnp=bnp, _brp=brp):
     else:
         s = _socket(socket.AF_INET, socket.SOCK_DGRAM)
         reg_packet = _brp(application_name="pytest", notifications=["Notification"])
-        s.sendto(reg_packet, ("127.0.0.1", 9887))
+        s.sendto(reg_packet, ("127.0.0.1", _GROWL_UDP_PORT))
         notification = _bnp(
             priority=4,
             message=message,
@@ -131,6 +131,6 @@ def send_growl(message='', title='', _socket=socket.socket, _bnp=bnp, _brp=brp):
             notification_name="Notification",
             application_name="pytest",
             sticky=False)
-        s.sendto(notification, ("127.0.0.1", 9887))
+        s.sendto(notification, ("127.0.0.1", _GROWL_UDP_PORT))
         s.close()
 
