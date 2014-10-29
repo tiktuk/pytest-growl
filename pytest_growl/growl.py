@@ -60,11 +60,10 @@ def pytest_terminal_summary(terminalreporter):
             if not quiet_mode:
                 send_growl(title="Session Ended At", message="%s" % time.strftime("%I:%M:%S %p"))
             return
+        elif skips == 0:
+            message_to_send = "%s Errors %s Passed %s Failed" % (errors, passes, fails)
         else:
-            if not skips:
-                message_to_send = "%s Errors %s Passed %s Failed" % (errors, passes, fails)
-            else:
-                message_to_send = "%s Errors %s Passed %s Failed %s Skipped" % (errors, passes, fails, skips)
+            message_to_send += " %s Skipped" % skips
         send_growl(title="Tests Complete", message=message_to_send)
         if not quiet_mode:
             send_growl(title="Session Ended At", message="%s" % time.strftime("%I:%M:%S %p"))
