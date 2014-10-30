@@ -39,31 +39,16 @@ def pytest_terminal_summary(terminalreporter):
     if terminalreporter.config.option.growl:
         tr = terminalreporter
         quiet_mode = tr.config.getini(QUIET_MODE_INI)
-        try:
-            errors = len(tr.stats['error'])
-        except KeyError:
-            errors = 0
-        try:
-            passes = len(tr.stats['passed'])
-        except KeyError:
-            passes = 0
-        try:
-            fails = len(tr.stats['failed'])
-        except KeyError:
-            fails = 0
-        try:
-            skips = len(tr.stats['deselected'])
-        except KeyError:
-            skips = 0
-        if (errors + passes + fails + skips) == 0:
+        status = {}
+        for key in tr.stats.keys():
+            if key:  # There is an empty key for setup/teardown calls
+                status[key] = len(tr.stats[key])
+        message_to_send = ', '.join(
+            ["%d %s " % (status[key], key.title()) for key in status]
+        )
+        import bpdb; bpdb.set_trace()
+        if len(status) == 0:
             send_growl(title="Alert", message="No Tests Ran")
-            if not quiet_mode:
-                send_growl(title="Session Ended At", message="%s" % time.strftime("%I:%M:%S %p"))
-            return
-        elif skips == 0:
-            message_to_send = "%s Errors %s Passed %s Failed" % (errors, passes, fails)
-        else:
-            message_to_send += " %s Skipped" % skips
         send_growl(title="Tests Complete", message=message_to_send)
         if not quiet_mode:
             send_growl(title="Session Ended At", message="%s" % time.strftime("%I:%M:%S %p"))
