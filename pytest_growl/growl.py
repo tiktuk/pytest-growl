@@ -46,7 +46,6 @@ def pytest_terminal_summary(terminalreporter):
         message_to_send = ', '.join(
             ["%d %s " % (status[key], key.title()) for key in status]
         )
-        import bpdb; bpdb.set_trace()
         if len(status) == 0:
             send_growl(title="Alert", message="No Tests Ran")
         send_growl(title="Tests Complete", message=message_to_send)
