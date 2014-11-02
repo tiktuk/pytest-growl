@@ -48,7 +48,11 @@ def pytest_terminal_summary(terminalreporter):
                 for test_report in tr.stats[key]:
                     if key in ('failed', 'error'):
                         entry = test_report.longrepr.reprtraceback.reprentries[0]
-                        send_growl(title=key.title(), message='\n'.join(entry.lines))
+                        send_growl(
+                            title=key.title(),
+                            message='\n'.join(entry.lines),
+                            callback='txmt://open/?url=file://%s/%s&line=%d&column=1' % (tr.curdir, entry.reprfileloc.path, entry.reprfileloc.lineno)
+                        )
         
         message_to_send = ', '.join(
             ["%d %s " % (status[key], key.title()) for key in status]
@@ -114,9 +118,9 @@ def bnp(application_name, notification_name, title, message, priority, sticky):
     return returned.getvalue()
 
 
-def send_growl(message='', title='', _socket=socket.socket, _bnp=bnp, _brp=brp):
+def send_growl(message='', title='', callback=None, _socket=socket.socket, _bnp=bnp, _brp=brp):
     if 'gntp' in globals():
-        gntp.notifier.mini(message, title=title, applicationName='pytest', noteType='Notification')
+        gntp.notifier.mini(message, title=title, applicationName='pytest', noteType='Notification', callback=callback)
     else:
         s = _socket(socket.AF_INET, socket.SOCK_DGRAM)
         reg_packet = _brp(application_name="pytest", notifications=["Notification"])
