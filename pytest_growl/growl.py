@@ -49,7 +49,6 @@ def pytest_terminal_summary(terminalreporter):
                     if key in ('failed', 'error'):
                         entry = test_report.longrepr.reprtraceback.reprentries[0]
                         send_growl(title=key.title(), message='\n'.join(entry.lines))
-                
         
         message_to_send = ', '.join(
             ["%d %s " % (status[key], key.title()) for key in status]
