@@ -40,15 +40,27 @@ def pytest_terminal_summary(terminalreporter):
         tr = terminalreporter
         quiet_mode = tr.config.getini(QUIET_MODE_INI)
         status = {}
+        
         for key in tr.stats.keys():
             if key:  # There is an empty key for setup/teardown calls
                 status[key] = len(tr.stats[key])
+                
+                for test_report in tr.stats[key]:
+                    if key in ('failed', 'error'):
+                        entry = test_report.longrepr.reprtraceback.reprentries[0]
+                        import bpdb; bpdb.set_trace()
+                        send_growl(title=key.title(), message='\n'.join(entry.lines))
+                
+        
         message_to_send = ', '.join(
             ["%d %s " % (status[key], key.title()) for key in status]
         )
+        
         if len(status) == 0:
             send_growl(title="Alert", message="No Tests Ran")
+        
         send_growl(title="Tests Complete", message=message_to_send)
+        
         if not quiet_mode:
             send_growl(title="Session Ended At", message="%s" % time.strftime("%I:%M:%S %p"))
 
