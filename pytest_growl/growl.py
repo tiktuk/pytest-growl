@@ -48,7 +48,6 @@ def pytest_terminal_summary(terminalreporter):
                 for test_report in tr.stats[key]:
                     if key in ('failed', 'error'):
                         entry = test_report.longrepr.reprtraceback.reprentries[0]
-                        import bpdb; bpdb.set_trace()
                         send_growl(title=key.title(), message='\n'.join(entry.lines))
                 
         
