@@ -16,6 +16,7 @@ _PACKET_TYPE_NOTIFICATION = 1
 
 
 QUIET_MODE_INI='quiet_growl'
+GROWL_CALLBACK_URL_INI='growl_url'
 
 def pytest_addoption(parser):
     """Adds options to control growl notifications."""
@@ -27,11 +28,10 @@ def pytest_addoption(parser):
     parser.addini(QUIET_MODE_INI,
                   default=False,
                   help='Minimize notifications (only results).')
-
-
-
-def notification_callback(path, lineno):
-    return 'txmt://open/?url=file://%s&line=%d&column=1' % (path, lineno)
+    parser.addini(GROWL_CALLBACK_URL_INI,
+        default='',
+        help='URL to open when clicking on single error notifications.'
+    )
 
 
 def pytest_sessionstart(session):
@@ -44,6 +44,7 @@ def pytest_terminal_summary(terminalreporter):
     if terminalreporter.config.option.growl:
         tr = terminalreporter
         quiet_mode = tr.config.getini(QUIET_MODE_INI)
+        growl_callback_url = tr.config.getini(GROWL_CALLBACK_URL_INI)
         status = {}
         
         for key in tr.stats.keys():
@@ -53,11 +54,17 @@ def pytest_terminal_summary(terminalreporter):
                 for test_report in tr.stats[key]:
                     if key in ('failed', 'error'):
                         entry = test_report.longrepr.reprtraceback.reprentries[0]
-                        fspath = '%s/%s' % (tr.curdir, entry.reprfileloc.path)
+                        callback_url = None
+                        
+                        if growl_callback_url:
+                            fspath = '%s/%s' % (tr.curdir, entry.reprfileloc.path)
+                            lineno = entry.reprfileloc.lineno
+                            callback_url=growl_callback_url.format(path=fspath, lineno=lineno)
+                            
                         send_growl(
                             title=key.title(),
                             message='\n'.join(entry.lines),
-                            callback=notification_callback(fspath, entry.reprfileloc.lineno)
+                            callback=callback_url
                         )
         
         message_to_send = ', '.join(
