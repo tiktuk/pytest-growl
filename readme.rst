@@ -6,6 +6,8 @@ pytest-growl
 
 This plugin sends growl notifications when your test session begins and ends, along with result counts in a short format.
 
+Optionally it also shows individual errors and opens the failed test in your favorite editor when clicking the message.
+
 .. image:: screenshot.png
 
 The theme displayed in the image is included if you wish to use it.
