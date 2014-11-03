@@ -29,6 +29,11 @@ def pytest_addoption(parser):
                   help='Minimize notifications (only results).')
 
 
+
+def notification_callback(path, lineno):
+    return 'txmt://open/?url=file://%s&line=%d&column=1' % (path, lineno)
+
+
 def pytest_sessionstart(session):
     if (session.config.option.growl
         and not session.config.getini(QUIET_MODE_INI)):
@@ -48,10 +53,11 @@ def pytest_terminal_summary(terminalreporter):
                 for test_report in tr.stats[key]:
                     if key in ('failed', 'error'):
                         entry = test_report.longrepr.reprtraceback.reprentries[0]
+                        fspath = '%s/%s' % (tr.curdir, entry.reprfileloc.path)
                         send_growl(
                             title=key.title(),
                             message='\n'.join(entry.lines),
-                            callback='txmt://open/?url=file://%s/%s&line=%d&column=1' % (tr.curdir, entry.reprfileloc.path, entry.reprfileloc.lineno)
+                            callback=notification_callback(fspath, entry.reprfileloc.lineno)
                         )
         
         message_to_send = ', '.join(
