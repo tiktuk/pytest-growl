@@ -33,9 +33,12 @@ _____________
 Example ``pytest.ini``::
 
   [pytest]
-  quiet_growl=True
-  growl_url=txmt://open/?url=file://{path}&line={lineno}&column=1
+  quiet_growl = True
+  growl_url = txmt://open/?url=file://{path}&line={lineno}&column=1
+  addopts = --individual-growl=1
 
 If ``quiet_growl`` is true no Test Start and Test End notifications will be shown.
 
-The value of ``growl_url`` is an URL that will be called when an individual error notification is clicked. In the example `TextMate <http://macromates.com/>`_ is opened with the caret at the error line.
+The value of ``growl_url`` is an URL that will be called when an individual error notification is clicked. In the example `TextMate <http://macromates.com/>`_ is opened with the caret at the error line. Only used if ``--individual-growl`` is also set. That way a notification is shown for each error.
+
+In the ``pytest.ini`` above ``--individual-growl=1`` is added to py.test's ``addopts`` setting, so it doesn't have to be set on the command line each time.

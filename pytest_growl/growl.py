@@ -18,6 +18,7 @@ _PACKET_TYPE_NOTIFICATION = 1
 QUIET_MODE_INI='quiet_growl'
 GROWL_CALLBACK_URL_INI='growl_url'
 
+
 def pytest_addoption(parser):
     """Adds options to control growl notifications."""
     group = parser.getgroup('terminal reporting')
@@ -25,6 +26,11 @@ def pytest_addoption(parser):
                     dest='growl',
                     default=True,
                     help='Enable Growl notifications.')
+    parser.addoption('--individual-growl',
+        dest='individual_growl',
+        default=False,
+        help='Show a growl notification for each error.'
+    )
     parser.addini(QUIET_MODE_INI,
                   default=False,
                   help='Minimize notifications (only results).')
@@ -51,21 +57,22 @@ def pytest_terminal_summary(terminalreporter):
             if key:  # There is an empty key for setup/teardown calls
                 status[key] = len(tr.stats[key])
                 
-                for test_report in tr.stats[key]:
-                    if key in ('failed', 'error'):
-                        entry = test_report.longrepr.reprtraceback.reprentries[0]
-                        callback_url = None
+                if terminalreporter.config.option.individual_growl:
+                    for test_report in tr.stats[key]:
+                        if key in ('failed', 'error'):
+                            entry = test_report.longrepr.reprtraceback.reprentries[0]
+                            callback_url = None
                         
-                        if growl_callback_url:
-                            fspath = '%s/%s' % (tr.curdir, entry.reprfileloc.path)
-                            lineno = entry.reprfileloc.lineno
-                            callback_url=growl_callback_url.format(path=fspath, lineno=lineno)
+                            if growl_callback_url:
+                                fspath = '%s/%s' % (tr.curdir, entry.reprfileloc.path)
+                                lineno = entry.reprfileloc.lineno
+                                callback_url=growl_callback_url.format(path=fspath, lineno=lineno)
                             
-                        send_growl(
-                            title=key.title(),
-                            message='\n'.join(entry.lines),
-                            callback=callback_url
-                        )
+                            send_growl(
+                                title=key.title(),
+                                message='\n'.join(entry.lines),
+                                callback=callback_url
+                            )
         
         message_to_send = ', '.join(
             ["%d %s " % (status[key], key.title()) for key in status]
