@@ -25,3 +25,17 @@ _____
 Invoke with the ``--growl`` option. Unfortunately py.test will not accept the option without a value::
 
   py.test --growl=GROWL
+
+
+Configuration
+_____________
+
+Example ``pytest.ini``::
+
+  [pytest]
+  quiet_growl=True
+  growl_url=txmt://open/?url=file://{path}&line={lineno}&column=1
+
+If ``quiet_growl`` is true no Test Start / End notifications will be shown.
+
+The value of ``growl_url`` is an URL that will be called when an individual error notification is clicked. In the example TextMate is opened with the caret at the error line.
